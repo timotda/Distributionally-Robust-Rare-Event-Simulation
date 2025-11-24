@@ -19,7 +19,7 @@ using **Wasserstein ball** ambiguity sets and a **two-stage conditional importan
 - Implements a **distributionally robust tail probability / VaR estimator** based on Wasserstein balls around a nominal Gaussian model.
 - Uses a **rare-event geometry + distance formulation** to turn a worst-case probability problem into a probability of a “robustified” event.
 - Uses **CIS variance reduction** in a **two-stage scheme**:
-  1. Estimate a dual radius parameter \( \bar{u} \) from data.
+  1. Estimate a dual radius parameter $\( \bar{u} \)$ from data.
   2. Plug \(\bar{u}\) into a CIS estimator of the worst-case tail probability.
 - Applies this to:
   - Linear portfolios of assets,
