@@ -50,7 +50,7 @@ This project models uncertainty by a **Wasserstein ball** around a nominal distr
   where $\(W_2\)$ is the 2-Wasserstein distance and $\(\mathbb{P}_0\)$ is a Gaussian reference model.
 - We are interested in the **worst-case tail probability** over that ball.
 
-Using duality, the worst-case tail probability can be rewritten as an event of the form $ \{d(X, E)^2 \le \bar{u}\} $
+Using duality, the worst-case tail probability can be rewritten as an event of the form $ d(X, E)^2 \le \bar{u}\$
 
 under the nominal model, where $\(E\)$ is a rare-event set (loss ≥ threshold) and $\(d(\cdot, E)\)$ is the distance to $\(E\)$.  
 So everything boils down to:
