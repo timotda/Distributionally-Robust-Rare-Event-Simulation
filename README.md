@@ -20,7 +20,7 @@ using **Wasserstein ball** ambiguity sets and a **two-stage conditional importan
 - Uses a **rare-event geometry + distance formulation** to turn a worst-case probability problem into a probability of a “robustified” event.
 - Uses **CIS variance reduction** in a **two-stage scheme**:
   1. Estimate a dual radius parameter $\( \bar{u} \)$ from data.
-  2. Plug \(\bar{u}\) into a CIS estimator of the worst-case tail probability.
+  2. Plug $\(\bar{u}\)$ into a CIS estimator of the worst-case tail probability.
 - Applies this to:
   - Linear portfolios of assets,
   - Portfolios with piecewise-linear option payoffs,
@@ -45,25 +45,25 @@ This project models uncertainty by a **Wasserstein ball** around a nominal distr
 
 - The set of plausible models is  
   \[
-  \mathcal{P} = \{ \mathbb{Q} : W_2(\mathbb{Q}, \mathbb{P}_0) \le \delta \}
+  \mathcal{P} = $\{ \mathbb{Q} : W_2(\mathbb{Q}, \mathbb{P}_0) \le \delta \}$
   \]
-  where \(W_2\) is the 2-Wasserstein distance and \(\mathbb{P}_0\) is a Gaussian reference model.
+  where $\(W_2\)$ is the 2-Wasserstein distance and $\(\mathbb{P}_0\)$ is a Gaussian reference model.
 - We are interested in the **worst-case tail probability** over that ball.
 
 Using duality, the worst-case tail probability can be rewritten as an event of the form
 
-\[
+$\[
 \{d(X, E)^2 \le \bar{u}\}
-\]
+\]$
 
-under the nominal model, where \(E\) is a rare-event set (loss ≥ threshold) and \(d(\cdot, E)\) is the distance to \(E\).  
+under the nominal model, where $\(E\)$ is a rare-event set (loss ≥ threshold) and $\(d(\cdot, E)\)$ is the distance to $\(E\)$.  
 So everything boils down to:
 
 1. **Distance computations** for the chosen financial model.
 2. **Efficient estimation** of  
-   \[
+   $\[
    \mathbb{P}_0\big(d(X, E)^2 \le \bar{u}\big)
-   \]
+   \]$
    using CIS.
 
 ---
@@ -76,9 +76,9 @@ These modules implement the generic CIS-based robust rare-event estimator, indep
 
 - **`find_xstar.py`**  
   Solves the quadratic program
-  \[
+  $\[
   \min_x \frac12\|x\|^2 \quad \text{s.t. } A x \ge b
-  \]
+  \]$
   to find:
   - `x_star`: closest point in the rare-event set to the origin,
   - `R`: its norm (distance),
@@ -102,17 +102,17 @@ These modules implement the generic CIS-based robust rare-event estimator, indep
 
 - **`get_radius_cis_linear.py`**  
   Given squared distances `d2` and likelihood ratios `L`, solves for  
-  \[
+ $ \[
   u: \quad \hat{h}(u) = \frac{1}{N}\sum d_i^2 \mathbf{1}\{d_i^2 \le u\} L_i = \delta^2.
-  \]
-  Uses Brent’s method to find the root, giving a simulation-based estimate of \( \bar{u} \).
+  \]$
+  Uses Brent’s method to find the root, giving a simulation-based estimate of $\( \bar{u} \)$.
 
 - **`robust_cis_linear.py`**  
   Core robust estimator once \( \bar{u} \) is known:
   - Computes  
-    \[
+    $\[
     \hat{p} = \mathbb{E}\big[ \mathbf{1}\{d^2 \le \bar{u}\} L \big]
-    \]
+    \]$
     as a Monte Carlo average.
   - Returns the estimate `p`, a 95% CI half-width `err`, and sample variances `var_p`, `var_H`.
 
@@ -121,8 +121,8 @@ These modules implement the generic CIS-based robust rare-event estimator, indep
   - Builds the covariance factor `Lc` from `Sigma`.
   - Constructs `(A, b)` for the linear loss event.
   - Calls `find_xstar` to get `x_star`, `R`, `QM`.
-  - **Stage 1**: CIS sampling + `get_radius_cis` to estimate \( \bar{u} \).
-  - **Stage 2**: CIS sampling at \(u = \bar{u}\) + `robust_cis_linear` to estimate worst-case tail probability and associated variances.
+  - **Stage 1**: CIS sampling + `get_radius_cis` to estimate $\( \bar{u} \)$.
+  - **Stage 2**: CIS sampling at $\(u = \bar{u}\)$ + `robust_cis_linear` to estimate worst-case tail probability and associated variances.
 
 There are analogous functions (not shown in this snippet) for other models:
 
@@ -148,16 +148,16 @@ These are the parts that change most between experiments: they define the rare-e
 
 - **`get_distance_piecewise.py`**  
   Distance to a **piecewise-affine** loss region of the form
-  \[
+  $\[
   \{x : w^\top \max(Ax + a,\ Bx + b) \le -v\},
-  \]
+  \]$
   which corresponds to a portfolio built from linear pieces (e.g. longs/shorts in calls and puts).
 
   - `solve_distance(...)` solves
-    \[
+   $$ \[
     \min_x \tfrac12 \|x - x_0\|^2
     \quad \text{s.t. } y \ge A x + a,\ y \ge B x + b,\ w^\top y \le -v
-    \]
+    \]$$
     using CVXPY, and returns the Euclidean distance.
   - `compute_distances_parallel(...)` applies that solver to many points in parallel using `joblib`.
   - Additional helper `piecewise_active_report(...)` (in `experiments_cis_piecewise.py`) inspects which affine branch is active at the closest point, for geometric diagnostics.
@@ -166,9 +166,9 @@ These are the parts that change most between experiments: they define the rare-e
 
 - **`get_distance_quadratic.py`**  
   Distance to a **quadratic loss region** of the form
-  \[
+  $$\[
   \{x : x^\top Q x + r^\top x + s \le -v\}.
-  \]
+  \]$$
   - Uses CVXPY to minimize \( \frac12 \|x - x_0\|^2 \) subject to the quadratic inequality.
   - `compute_distances_parallel(...)` runs this over columns of a sample matrix in parallel.
 
@@ -177,30 +177,30 @@ These are the parts that change most between experiments: they define the rare-e
 - **`get_distance_AO.py`**  
   Distance to a **polyhedral exercise region** \(E = \{y : G y \ge h\}\), which arises when discretizing the early-exercise boundary of an American option on a grid.
   - `solve_distance_AO(...)` solves
-    \[
+    $$\[
     \min_y \tfrac12 \|y - x_0\|^2 \quad \text{s.t. } G y \ge h
-    \]
+    \]$$
     with CVXPY (using OSQP).
   - `compute_distances_parallel(...)` applies this to many samples.
 
 #### Delta-hedging with transaction costs
 
 - **`get_distance_delta_hedge.py`**  
-  Distance in **factor space** \(y\) to a set of states where a delta-hedging strategy’s total cost is below a loss threshold:
-  - Model: \(x = \mu + L_{\text{chol}} y\) is the underlying state (e.g. returns).
+  Distance in **factor space** $\(y\)$ to a set of states where a delta-hedging strategy’s total cost is below a loss threshold:
+  - Model:$ \(x = \mu + L_{\text{chol}} y\) $is the underlying state (e.g. returns).
   - Cost is modeled as a combination of:
     - A **quadratic term** (matrix `Q_costs`),
     - An **L1 term** (`L_costs`), capturing proportional transaction costs,
     - A constant term `F_costs`.
   - `solve_distance(...)` solves
-    \[
+    $$\[
     \min_y \tfrac12\|y - y_0\|^2
     \quad \text{s.t. } 
     (x - x_\text{charm})^\top Q_\text{costs} (x - x_\text{charm})
       + \|L_\text{costs}^\top (x - x_\text{charm})\|_1
       + F_\text{costs} \le v,
-    \]
-    with \(x = \mu + L_{\text{chol}} y\).
+    \]$$
+    with $\(x = \mu + L_{\text{chol}} y\)$.
   - Again, `compute_distances_parallel(...)` vectorizes this over many samples.
 
 ---
@@ -224,7 +224,7 @@ These are the entry points you actually run. They all follow the same pattern:
     - Mean worst-case tail probability,
     - 95% CI half-width and relative error,
     - Average runtime per run,
-    - Estimated \( \bar{u} \), variance terms `var_H`, `var_p`,
+    - Estimated $\( \bar{u} \)$, variance terms `var_H`, `var_p`,
     - Plug-in **large-sample relative error** via `lsre_from_plug_in`.
 
 - **`experiments_mc_linear.py`**  
@@ -240,9 +240,9 @@ These are the entry points you actually run. They all follow the same pattern:
     - `option_price`,
     - `is_call` (call/put flag).
   - Constructs matrices `A`, `B`, vectors `a`, `b`, and weights `w` so that
-    \[
+    $$\[
     w^\top \max(Ax + a,\ Bx + b)
-    \]
+    \]$$
     reproduces the portfolio payoff.
   - Defines a loss threshold and Wasserstein radius, then calls
     `get_worst_p_piecewise_cis_cis` inside `compute_average_worst_prob`.
